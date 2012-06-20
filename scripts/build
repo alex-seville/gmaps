@@ -1,0 +1,35 @@
+#!/usr/bin/env node
+
+var builder = require('buildify');
+
+var templateData = {
+  version: '0.0.1',
+  googleapi: 'http://maps.google.com/maps/api/js?sensor=true&callback=gmapsLoaded'
+};
+
+var baseDir = __dirname + '/',
+ relativePath = '/../../';
+
+//Files to concatenate into main file
+var mapFile = relativePath+'gmaps.js';
+
+//Concatenate the main files
+var mainContents = builder(baseDir)
+  .load(mapFile)
+  .getContent();
+
+//Save regular dev and mini versions
+builder(baseDir)
+  .setContent(mainContents)
+  .wrap(relativePath+'scripts/build-templates/main.js', templateData)
+  .save(relativePath+'distribution/gmaps.js')
+  .uglify()
+  .save(relativePath+'distribution/gmaps.min.js');
+
+//Main AMD file (for RequireJS)
+builder(baseDir)
+  .setContent(mainContents)
+  .wrap(relativePath+'scripts/build-templates/main.amd.js', templateData)
+  .save(relativePath+'distribution/gmaps.amd.js')
+  .uglify()
+  .save(relativePath+'distribution/gmaps.amd.min.js');
